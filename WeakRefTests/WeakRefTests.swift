@@ -1,33 +1,32 @@
 //
-//  WeakRefTests.swift
-//  WeakRefTests
-//
-//  Created by Jesús Alfredo Hernández Alarcón on 08/02/21.
+//  Copyright © 2021 Jesús Alfredo Hernández Alarcón. All rights reserved.
 //
 
-import XCTest
 @testable import WeakRef
+import XCTest
 
 class WeakRefTests: XCTestCase {
+    func test_view_doesNotGenerateRetainCycles() {
+        let sut = makeSUT()
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        sut.loadViewIfNeeded()
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+    // MARK: - Helpers
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> ViewController {
+        let model = FetchMessage()
+        let controller = Composer.composeWith(fetcher: model)
+        trackForMemoryLeaks(model, file: file, line: line)
+        trackForMemoryLeaks(controller, file: file, line: line)
+        return controller
     }
+}
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+extension XCTestCase {
+    func trackForMemoryLeaks(_ instance: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
+        addTeardownBlock { [weak instance] in
+            XCTAssertNil(instance, "Instance should have been deallocated. Potential memory leak!", file: file, line: line)
         }
     }
-
 }
