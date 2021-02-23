@@ -4,14 +4,16 @@
 
 import Foundation
 
-class WeakRefProxy: View {
-    weak var view: (View & AnyObject)?
+class WeakRefProxy<T: AnyObject> {
+    weak var object: T?
 
-    init(_ view: View & AnyObject) {
-        self.view = view
+    init(_ object: T) {
+        self.object = object
     }
+}
 
+extension WeakRefProxy: View where T: View {
     func display(_ viewModel: ViewModel) {
-        view?.display(viewModel)
+        object?.display(viewModel)
     }
 }
